@@ -11,6 +11,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,12 +40,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.lagfix.app.ui.LagFixColors
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,6 +76,8 @@ private fun HomeScreen(onLogout: () -> Unit) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     var hasOverlay by remember { mutableStateOf(Settings.canDrawOverlays(context)) }
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -87,48 +96,60 @@ private fun HomeScreen(onLogout: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0F1115))
+            .background(LagFixColors.BgDeep)
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 6 }
         ) {
-            Text("LagFix", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-            Text(
-                "Avatar nổi giúp bạn dọn RAM của app, giảm hoạt động nền và xem FPS " +
-                        "ngay trên màn hình. LagFix không root, không can thiệp vào game " +
-                        "và không thể làm game nhanh hơn phần cứng cho phép.",
-                color = Color(0xFF8A93A3), fontSize = 13.sp, lineHeight = 19.sp
-            )
-            Spacer(Modifier.height(6.dp))
-
-            if (!hasOverlay) {
-                PrimaryButton("Cấp quyền hiển thị trên ứng dụng khác") {
-                    context.startActivity(
-                        Intent(
-                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                            Uri.parse("package:${context.packageName}")
-                        )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Text(
+                    "LagFix",
+                    style = TextStyle(
+                        brush = LagFixColors.brandGradient,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold
                     )
-                }
-            } else {
-                PrimaryButton("Bật avatar nổi") {
-                    if (Build.VERSION.SDK_INT >= 33 &&
-                        ContextCompat.checkSelfPermission(
-                            context, Manifest.permission.POST_NOTIFICATIONS
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                    OverlayService.start(context)
-                }
-                SecondaryButton("Tắt avatar nổi") { OverlayService.stop(context) }
-            }
+                )
+                Text(
+                    "Avatar nổi giúp bạn dọn RAM của app, giảm hoạt động nền và xem FPS " +
+                            "ngay trên màn hình. LagFix không root, không can thiệp vào game " +
+                            "và không thể làm game nhanh hơn phần cứng cho phép.",
+                    color = LagFixColors.TextDim, fontSize = 13.sp, lineHeight = 19.sp
+                )
+                Spacer(Modifier.height(6.dp))
 
-            Spacer(Modifier.height(10.dp))
-            SecondaryButton("Đăng xuất", danger = true) { onLogout() }
+                if (!hasOverlay) {
+                    PrimaryButton("Cấp quyền hiển thị trên ứng dụng khác") {
+                        context.startActivity(
+                            Intent(
+                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:${context.packageName}")
+                            )
+                        )
+                    }
+                } else {
+                    PrimaryButton("Bật avatar nổi") {
+                        if (Build.VERSION.SDK_INT >= 33 &&
+                            ContextCompat.checkSelfPermission(
+                                context, Manifest.permission.POST_NOTIFICATIONS
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                        OverlayService.start(context)
+                    }
+                    SecondaryButton("Tắt avatar nổi") { OverlayService.stop(context) }
+                }
+
+                Spacer(Modifier.height(10.dp))
+                SecondaryButton("Đăng xuất", danger = true) { onLogout() }
+            }
         }
     }
 }
@@ -138,13 +159,13 @@ private fun PrimaryButton(text: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFF4ADE80))
+            .height(52.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(LagFixColors.buttonGradient)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        Text(text, color = Color(0xFF06210F), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+        Text(text, color = Color(0xFF06210F), fontWeight = FontWeight.Bold, fontSize = 15.sp)
     }
 }
 
@@ -154,14 +175,14 @@ private fun SecondaryButton(text: String, danger: Boolean = false, onClick: () -
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(if (danger) Color(0xFF2A1518) else Color(0xFF1E232B))
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (danger) Color(0xFF2A1518) else LagFixColors.Surface)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text,
-            color = if (danger) Color(0xFFEF4444) else Color.White,
+            color = if (danger) LagFixColors.Danger else LagFixColors.TextMain,
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp
         )
