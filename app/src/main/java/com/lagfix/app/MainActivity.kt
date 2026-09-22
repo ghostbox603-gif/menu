@@ -45,12 +45,26 @@ import androidx.lifecycle.LifecycleEventObserver
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { HomeScreen() }
+
+        if (!Session.isLoggedIn(this)) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
+        setContent { HomeScreen(onLogout = { logout() }) }
+    }
+
+    private fun logout() {
+        OverlayService.stop(this)
+        Session.setLoggedIn(this, false)
+        startActivity(Intent(this, LoginActivity::class.java))
+        finish()
     }
 }
 
 @Composable
-private fun HomeScreen() {
+private fun HomeScreen(onLogout: () -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -112,6 +126,9 @@ private fun HomeScreen() {
                 }
                 SecondaryButton("Tắt avatar nổi") { OverlayService.stop(context) }
             }
+
+            Spacer(Modifier.height(10.dp))
+            SecondaryButton("Đăng xuất", danger = true) { onLogout() }
         }
     }
 }
@@ -132,16 +149,21 @@ private fun PrimaryButton(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun SecondaryButton(text: String, onClick: () -> Unit) {
+private fun SecondaryButton(text: String, danger: Boolean = false, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)
             .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFF1E232B))
+            .background(if (danger) Color(0xFF2A1518) else Color(0xFF1E232B))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        Text(text, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+        Text(
+            text,
+            color = if (danger) Color(0xFFEF4444) else Color.White,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp
+        )
     }
 }
