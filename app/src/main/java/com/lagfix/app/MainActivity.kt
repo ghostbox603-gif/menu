@@ -109,20 +109,14 @@ private fun HomeScreen(onLogout: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 Text(
-                    "LagFix",
+                    "Proxy Kirosff",
                     style = TextStyle(
                         brush = LagFixColors.brandGradient,
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold
                     )
                 )
-                Text(
-                    "Avatar nổi giúp bạn dọn RAM của app, giảm hoạt động nền và xem FPS " +
-                            "ngay trên màn hình. LagFix không root, không can thiệp vào game " +
-                            "và không thể làm game nhanh hơn phần cứng cho phép.",
-                    color = LagFixColors.TextDim, fontSize = 13.sp, lineHeight = 19.sp
-                )
-                Spacer(Modifier.height(6.dp))
+    
 
                 if (!hasOverlay) {
                     PrimaryButton("Cấp quyền hiển thị trên ứng dụng khác") {
@@ -134,7 +128,7 @@ private fun HomeScreen(onLogout: () -> Unit) {
                         )
                     }
                 } else {
-                    PrimaryButton("Bật avatar nổi") {
+                    PrimaryButton("Bật Menu Proxy") {
                         if (Build.VERSION.SDK_INT >= 33 &&
                             ContextCompat.checkSelfPermission(
                                 context, Manifest.permission.POST_NOTIFICATIONS
@@ -144,11 +138,11 @@ private fun HomeScreen(onLogout: () -> Unit) {
                         }
                         OverlayService.start(context)
                     }
-                    SecondaryButton("Tắt avatar nổi") { OverlayService.stop(context) }
+                    SecondaryButton("Tắt Menu Proxy") { OverlayService.stop(context) }
                 }
 
                 Spacer(Modifier.height(10.dp))
-                SecondaryButton("Đăng xuất", danger = true) { onLogout() }
+                SecondaryButton("Đăng Xuất", danger = true) { onLogout() }
             }
         }
     }
