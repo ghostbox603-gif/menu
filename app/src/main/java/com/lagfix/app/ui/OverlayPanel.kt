@@ -89,22 +89,18 @@ fun OverlayPanel(
                     Header(state.gameMode || state.performanceMode, onClose)
                     CleanupCard(state, onCleanup)
                     ToggleRow(
-                        title = "Performance Mode",
-                        subtitle = "Giảm animation của LagFix",
+                        title = "AimLock",
                         checked = state.performanceMode,
                         enabled = !state.gameMode,
                         onChange = onPerformanceToggle
                     )
                     ToggleRow(
-                        title = "Game Mode",
-                        subtitle = "Thu gọn & giảm hoạt động nền",
+                        title = "Esp Box + Line",
                         checked = state.gameMode,
                         onChange = onGameToggle
                     )
                     ToggleRow(
-                        title = "Hiện FPS",
-                        subtitle = if (state.showFps) "${state.fps} FPS (đo của overlay)"
-                        else "Tắt để tiết kiệm pin",
+                        title = "Bypass Login",
                         checked = state.showFps,
                         enabled = !state.performanceMode,
                         onChange = onFpsToggle
@@ -169,9 +165,6 @@ private fun Header(active: Boolean, onClose: () -> Unit) {
         Column {
             Text("LagFix", color = LagFixColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 17.sp)
             Text(
-                if (active) "Đang tối ưu" else "Bình thường",
-                color = if (active) LagFixColors.Green else LagFixColors.TextDim,
-                fontSize = 11.sp
             )
         }
         Text(
@@ -196,7 +189,7 @@ private fun CleanupCard(state: OverlayState, onCleanup: () -> Unit) {
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text("RAM Cleanup", color = LagFixColors.TextMain, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+        Text("Inject Free Fire", color = LagFixColors.TextMain, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
 
         Box(
             modifier = Modifier
@@ -211,7 +204,7 @@ private fun CleanupCard(state: OverlayState, onCleanup: () -> Unit) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                if (state.cleaning) "Đang xử lý..." else "Chạy dọn dẹp",
+                if (state.cleaning) "Đang xử lý..." else "Đã Hoàn Thàn",
                 color = if (state.cleaning) LagFixColors.TextDim else Color(0xFF06210F),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 13.sp
@@ -220,7 +213,7 @@ private fun CleanupCard(state: OverlayState, onCleanup: () -> Unit) {
 
         Text(
             text = state.cleanupResult
-                ?: "Giải phóng bộ nhớ của LagFix và đo RAM trống thực tế.",
+                ?: "Đang Xử Lí.",
             color = LagFixColors.TextDim,
             fontSize = 11.sp,
             lineHeight = 15.sp
